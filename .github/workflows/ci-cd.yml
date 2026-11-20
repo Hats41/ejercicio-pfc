@@ -95,7 +95,6 @@ jobs:
   stage:
     name: Stage · Validar candidato
     needs: quality
-    if: github.event_name == 'push'
     permissions:
       actions: read
       statuses: read
