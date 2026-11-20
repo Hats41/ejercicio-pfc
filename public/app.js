@@ -90,12 +90,17 @@ function render(rebuild=true) {
   const cards=get('cards');cards.replaceChildren();
   const d=get('district').value,m=get('material').value;
   const results=view==='points'?points.filter(p=>matches(p,d,m)):!a.id?[]:view==='mine'?offers.filter(o=>isMine(o,a.id)):offers.filter(o=>o.state==='available'&&matches(o,d,m));
+  get('clear-filters').hidden=!d&&!m;
+  const showCount=view==='points'||Boolean(a.id);
+  get('result-count').textContent=showCount?`${results.length} ${results.length===1?'resultado':'resultados'}`:'';
   for(const item of results){
     const card=el('article',undefined,'card');
     card.append(el('h3',view==='points'?item.name:item.material),el('p',item.district,'meta'));
     if(view==='points'){
-      card.append(el('p',item.hours));
-      for(const value of item.materials)card.append(el('span',value,'badge'));
+      card.append(el('p',item.hours,'hours'));
+      const tags=el('div',undefined,'tags');
+      for(const value of item.materials)tags.append(el('span',value,'badge'));
+      card.append(tags);
     } else {
       card.append(el('p',`${item.kg} kg`),el('span',statusLabel[item.state],'badge'));
       for(const [change,name,success] of [['reserve','Reservar','Oferta reservada.'],['collect','Confirmar retiro','Retiro confirmado.'],['cancel','Retirar oferta','Oferta cancelada.']]){
@@ -105,7 +110,7 @@ function render(rebuild=true) {
     }
     cards.append(card);
   }
-  if(!results.length)cards.append(el('p',view!=='points'&&!a.id?'Inicia sesión para consultar ofertas y retiros.':'No hay resultados con estos filtros.'));
+  if(!results.length)cards.append(el('p',view!=='points'&&!a.id?'Inicia sesión para consultar ofertas y retiros.':view==='mine'?'Aún no tienes ofertas ni retiros.':'No hay resultados con estos filtros.','empty'));
 }
 async function refresh() {
   const requested=++epoch;
@@ -121,5 +126,11 @@ for(const b of document.querySelectorAll('[data-view]'))b.onclick=()=>{
 get('role').onchange=()=>{message('');render();};
 get('district').onchange=()=>render(false);
 get('material').onchange=()=>render(false);
+get('clear-filters').onclick=()=>{
+  get('district').value='';
+  get('material').value='';
+  render(false);
+  get('district').focus();
+};
 render();
 if(live&&session())getProfile().then(role=>{liveRole=role;if(view!=='points')void refresh();}).catch(error=>message(error.message,true));
