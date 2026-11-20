@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Entra a tu cuenta de Ciclo Local para publicar, reservar y registrar retiros de reciclables.">
+  <title>Acceso | Ciclo Local</title>
+  <link rel="stylesheet" href="./visual.css">
+  <link rel="stylesheet" href="./acceso.css">
+</head>
+<body class="access-page">
+  <header class="site-header">
+    <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">↻</span>Ciclo Local</a>
+    <a class="back-link" href="./">← Volver al inicio</a>
+  </header>
+  <main class="access-layout">
+    <section class="access-card" aria-labelledby="access-title">
+      <div id="access-form-panel" hidden>
+        <h1 id="access-title">Inicia sesión</h1>
+        <p id="access-intro">Consulta tus ofertas y retiros con tu cuenta de Ciclo Local.</p>
+        <form id="access-form">
+          <label for="email">Correo electrónico</label>
+          <input id="email" name="email" type="email" autocomplete="username" required>
+          <label for="password">Contraseña</label>
+          <div class="password-field">
+            <input id="password" name="password" type="password" autocomplete="current-password" required>
+            <button id="password-toggle" type="button" aria-controls="password" aria-pressed="false">Mostrar</button>
+          </div>
+          <small id="password-hint" hidden>Usa al menos 10 caracteres.</small>
+          <button id="access-submit" class="access-button" type="submit">Iniciar sesión</button>
+        </form>
+        <p class="access-switch"><span id="mode-prompt">¿Primera vez en Ciclo Local?</span> <button id="access-toggle" type="button">Crear cuenta</button></p>
+      </div>
+      <div id="access-profile" hidden>
+        <h1 id="profile-title">Elige tu perfil</h1>
+        <p id="profile-intro">Esta elección define cómo participas en Ciclo Local.</p>
+        <div class="profile-choices" id="profile-choices">
+          <button type="button" data-role="neighbor"><strong>Vecino</strong><span>Publica materiales reciclables.</span></button>
+          <button type="button" data-role="collector"><strong>Recolector</strong><span>Reserva ofertas disponibles y confirma su retiro.</span></button>
+        </div>
+        <a class="access-button" id="profile-continue" href="./#actividad" hidden>Ir a mi actividad</a>
+        <button id="access-logout" class="text-button" type="button">Cerrar sesión</button>
+      </div>
+      <div id="access-demo" hidden>
+        <h1>Modo demostración</h1>
+        <p>En esta instalación puedes explorar el catálogo y probar las ofertas sin una cuenta.</p>
+        <a class="access-button" id="demo-continue" href="./#actividad">Continuar a la demostración</a>
+      </div>
+      <p class="access-notice" id="access-notice" role="status" aria-live="polite">Cargando acceso…</p>
+    </section>
+    <img class="access-photo" src="./reciclaje-lima.webp" alt="" width="1280" height="853">
+  </main>
+  <footer><b>Ciclo Local</b><span>Proyecto académico · Información de acopio ilustrativa</span></footer>
+  <script type="module" src="./acceso.js"></script>
+</body>
+</html>

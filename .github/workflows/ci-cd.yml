@@ -114,7 +114,9 @@ jobs:
           base=http://127.0.0.1:8080
           curl --fail --silent --show-error --retry 5 --retry-connrefused "$base/" -o candidate.html
           grep -Fqi 'Ciclo Local' candidate.html
-          for asset in app.js visual.css; do
+          curl --fail --silent --show-error "$base/acceso.html" -o access.html
+          grep -Fqi 'Inicia sesión' access.html
+          for asset in app.js visual.css acceso.js acceso.css; do
             curl --fail --silent --show-error "$base/$asset" -o /dev/null
           done
       - name: Confirmar Preview de Vercel para el commit de test
@@ -158,4 +160,6 @@ jobs:
           curl --fail --silent --show-error -D headers.txt -o home.html https://project-eku43.vercel.app/
           grep -Fqi 'Ciclo Local' home.html
           grep -qi '^content-security-policy:' headers.txt
+          curl --fail --silent --show-error https://project-eku43.vercel.app/acceso.html -o access.html
+          grep -Fqi 'Inicia sesión' access.html
           echo '[Web de producción verificada](https://project-eku43.vercel.app/)' >> "$GITHUB_STEP_SUMMARY"
