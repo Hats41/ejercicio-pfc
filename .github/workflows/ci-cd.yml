@@ -1,0 +1,161 @@
+name: CI/CD de Ciclo Local
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, test]
+permissions:
+  contents: read
+jobs:
+  build:
+    name: Build web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Instalar dependencias
+        run: npm ci
+      - name: Compilar
+        run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ciclo-local-dist
+          path: dist/
+          if-no-files-found: error
+  unit:
+    name: Pruebas de dominio
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - name: Pruebas automatizadas
+        run: npm test
+  security:
+    name: Seguridad y dependencias
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - name: Escaneo de secretos y patrones inseguros
+        run: npm run security
+      - name: Auditar dependencias
+        run: npm audit --audit-level=high
+  postgres:
+    name: Integración PostgreSQL
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Aplicar esquema y verificar permisos
+        run: |
+          psql_ci() { psql -X -v ON_ERROR_STOP=1 -h localhost -U postgres -f "$1"; }
+          psql_ci supabase/tests/bootstrap-ci.sql
+          for migration in supabase/migrations/*.sql; do
+            psql_ci "$migration"
+          done
+          psql_ci supabase/tests/permissions.sql
+          psql_ci supabase/tests/catalog.sql
+
+  quality:
+    name: Control de calidad y seguridad
+    needs: [build, unit, security, postgres]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Registrar controles aprobados
+        run: echo 'Build, pruebas, auditoría e integración PostgreSQL aprobados.' >> "$GITHUB_STEP_SUMMARY"
+
+  stage:
+    name: Stage · Validar candidato
+    needs: quality
+    if: github.event_name == 'push'
+    permissions:
+      actions: read
+      statuses: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: ciclo-local-dist
+          path: dist
+      - name: Probar el artefacto compilado por HTTP
+        run: |
+          python3 -m http.server 8080 --bind 127.0.0.1 --directory dist &
+          server=$!
+          trap 'kill "$server" 2>/dev/null || true' EXIT
+          base=http://127.0.0.1:8080
+          curl --fail --silent --show-error --retry 5 --retry-connrefused "$base/" -o candidate.html
+          grep -Fqi 'Ciclo Local' candidate.html
+          for asset in app.js visual.css; do
+            curl --fail --silent --show-error "$base/$asset" -o /dev/null
+          done
+      - name: Confirmar Preview de Vercel para el commit de test
+        if: github.ref == 'refs/heads/test'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for attempt in $(seq 1 24); do
+            state=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/status" --jq '[.statuses[] | select(.context == "Vercel")][0].state // "pending"')
+            if [ "$state" = success ]; then
+              echo 'Preview confirmado por Vercel para este commit.' >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Vercel no confirmó el Preview de $GITHUB_SHA." >&2
+          exit 1
+
+  production:
+    name: Producción · Verificar Vercel
+    needs: stage
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      statuses: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Esperar confirmación de Vercel para el commit de main
+        run: |
+          for attempt in $(seq 1 24); do
+            state=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/status" --jq '[.statuses[] | select(.context == "Vercel")][0].state // "pending"')
+            if [ "$state" = success ]; then exit 0; fi
+            sleep 10
+          done
+          echo "Vercel no confirmó el despliegue de $GITHUB_SHA." >&2
+          exit 1
+      - name: Probar la web pública y su política de contenido
+        run: |
+          curl --fail --silent --show-error -D headers.txt -o home.html https://project-eku43.vercel.app/
+          grep -Fqi 'Ciclo Local' home.html
+          grep -qi '^content-security-policy:' headers.txt
+          echo '[Web de producción verificada](https://project-eku43.vercel.app/)' >> "$GITHUB_STEP_SUMMARY"
