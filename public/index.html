@@ -7,11 +7,11 @@
 <header class="site-header">
   <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">↻</span>Ciclo Local</a>
   <nav aria-label="Principal"><button data-view="points">Puntos de acopio</button><button data-view="offers">Ofertas</button><button data-view="mine">Mi actividad</button></nav>
+  <a id="account-link" class="account-link" href="./acceso.html">Iniciar sesión <span aria-hidden="true">↗</span></a>
 </header>
 <main>
 <section class="hero" aria-labelledby="hero-title">
   <div class="hero-copy">
-    <p class="overline">RECICLAJE VECINAL · LIMA</p>
     <h1 id="hero-title">Dale otra vida a lo que <em>separas.</em></h1>
     <p>Encuentra dónde entregar tus reciclables o publica una oferta para que un recolector pueda recogerlos.</p>
     <div class="hero-actions">
@@ -21,8 +21,19 @@
   </div>
   <div class="hero-photo"><img src="./reciclaje-lima.webp" alt="" width="1280" height="853" fetchpriority="high"></div>
 </section>
+<section class="route-strip" aria-label="Qué puedes hacer">
+  <button data-view="points"><span aria-hidden="true">⌖</span><strong>Explora Lima</strong><small>Encuentra puntos por distrito y material.</small></button>
+  <button data-view="offers"><span aria-hidden="true">↔</span><strong>Coordina un retiro</strong><small>Publica reciclables o reserva una oferta.</small></button>
+  <button data-view="mine"><span aria-hidden="true">✓</span><strong>Revisa tu actividad</strong><small>Consulta tus publicaciones y retiros.</small></button>
+</section>
 <section class="work" id="work"><div class="heading"><h2 id="title" tabindex="-1">Puntos de acopio</h2><label id="profile">Perfil demo <select id="role"><option value="neighbor">Vecino</option><option value="collector">Recolector</option></select></label></div>
 <p id="mode"></p><p id="notice" role="status" aria-live="polite"></p>
-<section id="auth" hidden></section><section id="filters" aria-label="Filtros"><label>Distrito<select id="district"></select></label><label>Material<select id="material"></select></label><button id="clear-filters" type="button" hidden>Limpiar filtros</button></section>
-<section id="create" hidden></section><p id="result-count" class="result-count" aria-live="polite"></p><div class="grid" id="cards"></div></section></main>
+<section id="auth" aria-label="Acceso a tu cuenta" hidden></section><section id="filters" aria-label="Filtros"><label>Distrito<select id="district"></select></label><label>Material<select id="material"></select></label><button id="clear-filters" type="button" hidden>Limpiar filtros</button></section>
+<section id="create" hidden></section><p id="result-count" class="result-count" aria-live="polite"></p>
+<div class="directory" id="directory"><div class="grid" id="cards"></div>
+<aside id="map" class="map-panel" aria-label="Mapa de acopio" hidden>
+  <div><h3 id="map-title">Mapa de acopio</h3><p id="map-note"></p></div>
+  <iframe id="map-frame" title="Mapa interactivo de OpenStreetMap" loading="lazy" referrerpolicy="no-referrer"></iframe>
+  <div class="map-footer"><a id="map-link" target="_blank" rel="noopener noreferrer">Abrir mapa ↗</a><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap</a></div>
+</aside></div></section></main>
 <footer><b>Ciclo Local</b><span>Proyecto académico · Información de acopio ilustrativa</span></footer><script type="module" src="./app.js"></script></body></html>
