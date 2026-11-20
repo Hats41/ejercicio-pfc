@@ -1,11 +1,28 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Encuentra puntos de acopio y coordina la recolección de materiales reciclables.">
-<title>Ciclo Local | Red de reciclaje</title><link rel="stylesheet" href="./style.css"></head>
-<body><header><a class="brand" href="./">Ciclo<span>Local</span></a><nav aria-label="Principal"><button data-view="points">Puntos de acopio</button><button data-view="offers">Ofertas</button><button data-view="mine">Mi actividad</button></nav></header>
-<main><section class="hero"><div><p class="overline">RED LOCAL DE RECICLAJE</p><h1>Lo que separas<br><em>vuelve a servir.</em></h1><p>Encuentra dónde entregar tus reciclables o conecta con quien puede recogerlos en tu distrito.</p><button class="primary" data-view="points">Buscar puntos de acopio</button></div><div class="art" aria-hidden="true"><span>↻</span><strong>Separa.<br>Entrega.<br>Recicla.</strong></div></section>
+<title>Ciclo Local | Red de reciclaje</title><link rel="stylesheet" href="./visual.css"></head>
+<body>
+<a class="skip" href="#work">Ir al buscador</a>
+<header class="site-header">
+  <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">↻</span>Ciclo Local</a>
+  <nav aria-label="Principal"><button data-view="points">Puntos de acopio</button><button data-view="offers">Ofertas</button><button data-view="mine">Mi actividad</button></nav>
+</header>
+<main>
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero-copy">
+    <p class="overline">RECICLAJE VECINAL · LIMA</p>
+    <h1 id="hero-title">Dale otra vida a lo que <em>separas.</em></h1>
+    <p>Encuentra dónde entregar tus reciclables o publica una oferta para que un recolector pueda recogerlos.</p>
+    <div class="hero-actions">
+      <button class="primary" data-view="points">Buscar puntos <span aria-hidden="true">↘</span></button>
+      <button class="secondary" data-view="offers">Ver ofertas</button>
+    </div>
+  </div>
+  <div class="hero-photo"><img src="./reciclaje-lima.webp" alt="" width="1280" height="853" fetchpriority="high"></div>
+</section>
 <section class="work" id="work"><div class="heading"><h2 id="title" tabindex="-1">Puntos de acopio</h2><label id="profile">Perfil demo <select id="role"><option value="neighbor">Vecino</option><option value="collector">Recolector</option></select></label></div>
 <p id="mode"></p><p id="notice" role="status" aria-live="polite"></p>
-<section id="auth" hidden></section><section id="filters" aria-label="Filtros"><label>Distrito<select id="district"></select></label><label>Material<select id="material"></select></label></section>
-<section id="create" hidden></section><div class="grid" id="cards"></div></section></main>
+<section id="auth" hidden></section><section id="filters" aria-label="Filtros"><label>Distrito<select id="district"></select></label><label>Material<select id="material"></select></label><button id="clear-filters" type="button" hidden>Limpiar filtros</button></section>
+<section id="create" hidden></section><p id="result-count" class="result-count" aria-live="polite"></p><div class="grid" id="cards"></div></section></main>
 <footer><b>Ciclo Local</b><span>Proyecto académico · Información de acopio ilustrativa</span></footer><script type="module" src="./app.js"></script></body></html>
