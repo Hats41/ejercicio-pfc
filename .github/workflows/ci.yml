@@ -7,7 +7,8 @@ on:
 permissions:
   contents: read
 jobs:
-  build-test-security:
+  build:
+    name: Build web
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,9 +22,60 @@ jobs:
         run: npm ci
       - name: Compilar
         run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ciclo-local-dist
+          path: dist/
+          if-no-files-found: error
+  unit:
+    name: Pruebas de dominio
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
       - name: Pruebas automatizadas
         run: npm test
+  security:
+    name: Seguridad y dependencias
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
       - name: Escaneo de secretos y patrones inseguros
         run: npm run security
       - name: Auditar dependencias
         run: npm audit --audit-level=high
+  postgres:
+    name: Integración PostgreSQL
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Aplicar esquema y verificar permisos
+        run: |
+          psql -X -v ON_ERROR_STOP=1 -h localhost -U postgres -f supabase/tests/bootstrap-ci.sql
+          psql -X -v ON_ERROR_STOP=1 -h localhost -U postgres -f supabase/migrations/001_ciclo_local.sql
+          psql -X -v ON_ERROR_STOP=1 -h localhost -U postgres -f supabase/tests/permissions.sql
