@@ -1,0 +1,29 @@
+name: Verificar Ciclo Local
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, test]
+permissions:
+  contents: read
+jobs:
+  build-test-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Instalar dependencias
+        run: npm ci
+      - name: Compilar
+        run: npm run build
+      - name: Pruebas automatizadas
+        run: npm test
+      - name: Escaneo de secretos y patrones inseguros
+        run: npm run security
+      - name: Auditar dependencias
+        run: npm audit --audit-level=high

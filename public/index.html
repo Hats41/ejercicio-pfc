@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Encuentra puntos de acopio y coordina la recolección de materiales reciclables.">
+<title>Ciclo Local | Red de reciclaje</title><link rel="stylesheet" href="./style.css"></head>
+<body><header><a class="brand" href="./">Ciclo<span>Local</span></a><nav aria-label="Principal"><button data-view="points">Puntos de acopio</button><button data-view="offers">Ofertas</button><button data-view="mine">Mi actividad</button></nav></header>
+<main><section class="hero"><div><p class="overline">RED LOCAL DE RECICLAJE</p><h1>Lo que separas<br><em>vuelve a servir.</em></h1><p>Encuentra dónde entregar tus reciclables o conecta con quien puede recogerlos en tu distrito.</p><button class="primary" data-view="points">Buscar puntos de acopio</button></div><div class="art" aria-hidden="true"><span>↻</span><strong>Separa.<br>Entrega.<br>Recicla.</strong></div></section>
+<section class="work" id="work"><div class="heading"><h2 id="title" tabindex="-1">Puntos de acopio</h2><label id="profile">Perfil demo <select id="role"><option value="neighbor">Vecino</option><option value="collector">Recolector</option></select></label></div>
+<p id="mode"></p><p id="notice" role="status" aria-live="polite"></p>
+<section id="auth" hidden></section><section id="filters" aria-label="Filtros"><label>Distrito<select id="district"></select></label><label>Material<select id="material"></select></label></section>
+<section id="create" hidden></section><div class="grid" id="cards"></div></section></main>
+<footer><b>Ciclo Local</b><span>Proyecto académico · Información de acopio ilustrativa</span></footer><script type="module" src="./app.js"></script></body></html>
