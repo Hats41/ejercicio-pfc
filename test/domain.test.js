@@ -1,11 +1,21 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
-import {isMine,matches,points,transition,validateOffer} from '../public/domain.js';
+import {isMine,matches,pointMapLinks,points,transition,validateOffer} from '../public/domain.js';
 const resident={id:'n',role:'neighbor'},collector={id:'c',role:'collector'},other={id:'x',role:'collector'};
 const offer={id:'o',owner_id:'n',collector_id:null,state:'available'};
 test('filtra distrito y material de manera conjunta',()=>{
   assert.equal(points.filter(p=>matches(p,'Barranco','Vidrio')).length,1);
   assert.equal(points.filter(p=>matches(p,'Barranco','Papel')).length,0);
+});
+test('centra el mapa de OpenStreetMap en el punto seleccionado',()=>{
+  const point=points.find(item=>item.slug==='surco');
+  const {embed,page}=pointMapLinks(point);
+  const map=new URL(embed);
+  const [west,south,east,north]=map.searchParams.get('bbox').split(',').map(Number);
+  assert.equal(map.origin,'https://www.openstreetmap.org');
+  assert.equal(map.searchParams.get('marker'),`${point.latitude},${point.longitude}`);
+  assert.ok(west<point.longitude && east>point.longitude && south<point.latitude && north>point.latitude);
+  assert.match(page,/#map=14\//);
 });
 test('valida y normaliza una oferta',()=>{
   assert.deepEqual(validateOffer({material:'Metal',district:'Surco',kg:'2.5'}),{material:'Metal',district:'Surco',kg:2.5});

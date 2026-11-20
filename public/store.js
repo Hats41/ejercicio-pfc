@@ -1,5 +1,5 @@
 import {config} from './config.js';
-import {validateOffer,transition} from './domain.js';
+import {points,validateOffer,transition} from './domain.js';
 
 const demoKey='ciclo-local-demo-v1';
 const liveKey='ciclo-local-session-v1';
@@ -39,6 +39,14 @@ export async function getProfile() {
 }
 export async function chooseProfile(role) {
   return request('/rest/v1/rpc/choose_profile',{method:'POST',token:session()?.access_token,body:{p_role:role}});
+}
+export async function listCollectionPoints() {
+  if(!live)return points;
+  const columns='slug,name,district,hours,latitude,longitude,is_demo,collection_point_materials(material)';
+  const rows=await request(`/rest/v1/collection_points?select=${columns}&order=district.asc`);
+  return rows.map(({collection_point_materials: rows, ...point})=>({
+    ...point,materials:rows.map(({material})=>material),
+  }));
 }
 function localOffers() {
   try { const data=JSON.parse(localStorage.getItem(demoKey));return Array.isArray(data)?data:demoSeed; }
